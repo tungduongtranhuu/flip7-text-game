@@ -5,9 +5,9 @@ export class ModifierCard {
   }
 
   applyModifier(score) {
-    if (this.type === "add") {
+    if (this.type === "+") {
       return score + this.value;
-    } else if (this.type === "multiply") {
+    } else if (this.type === "*") {
       return score * this.value;
     }
     return score;
