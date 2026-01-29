@@ -36,6 +36,9 @@ export class Deck {
   }
 
   draw() {
+    if (this.cards.length === 0) {
+      return null;
+    }
     const card = this.cards.pop();
     this.playedCards.push(card);
     return card;

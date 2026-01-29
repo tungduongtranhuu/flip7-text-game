@@ -15,22 +15,33 @@ export class Game {
     console.log("\n--- Commence par un nouveau tour ---");
 
     this.players.forEach(p => p.resetForRound());
+    if (this.deck.cards.length ===0 && this.deck.playedCards.length >0){
+      console.log(" La pioche est vide, on mélange les cartes défaussées.");
+      this.deck.cards=[...this.deck.playedCards];
+      this.deck.playedCards=[];
+      this.deck.shuffle();
+    }
 
     // Distribution initiale des cartes
     for (const player of this.players) {
       const card = this.deck.draw();
-      if (card instanceof ModifierCard) {
-        console.log(`🃏 ${player.name} a reçu une carte spéciale: ${card.type} ${card.value}`);
-        player.addModifier(card); // Ajouter une carte Modifier au joueur
-      } else if (card instanceof ActionCard) {
-        console.log(`🃏 ${player.name} a reçu une carte spéciale: ${card.type}`);
-        card.applyEffect(player, this); //Appliquer l'effet de la carte Action
-      } else {
-        console.log(`🃏 ${player.name} a reçu: ${card}`);
-        player.addCard(card);
+      if (card === null) {
+        console.log("⚠️ Plus de cartes disponibles pour la distribution.");
+        break;
+      }
+      else {
+        if (card instanceof ModifierCard) {
+          console.log(`🃏 ${player.name} a reçu une carte spéciale: ${card.type} ${card.value}`);
+          player.addModifier(card); // Ajouter une carte Modifier au joueur
+        } else if (card instanceof ActionCard) {
+          console.log(`🃏 ${player.name} a reçu une carte spéciale: ${card.type}`);
+          card.applyEffect(player, this); //Appliquer l'effet de la carte Action
+        } else {
+          console.log(`🃏 ${player.name} a reçu: ${card}`);
+          player.addCard(card);
+        }
       }
     }
-
     // Gestion des tours des joueurs
     for (const player of this.players) {
       if (!player.active) continue; // Ignorer les joueurs inactifs
@@ -45,9 +56,22 @@ export class Game {
         continue; // Passer le tour de ce joueur
       }
 
-      const nbCarte = parseInt(await ask("Combien de cartes à tirer? (max: 7) "));
+      let nbCarte = parseInt(await ask("Combien de cartes à tirer? (max: 7) "));
+      if (nbCarte > 7) {
+          nbCarte = 7;
+        }
       for (let i = 0; i < nbCarte; i++) {
+        if (this.deck.cards.length === 0 && this.deck.playedCards.length > 0) {
+          console.log("La pioche est vide, on mélange les cartes défaussées.");
+          this.deck.cards=[...this.deck.playedCards];
+          this.deck.playedCards=[];
+          this.deck.shuffle();
+        }
         const card = this.deck.draw();
+        if (card === null) {
+          console.log("La pioche est vide, impossible de tirer plus de cartes.");
+          break;
+        }
         if (card instanceof ActionCard) {
           card.applyEffect(player, this);
         } else if (card instanceof ModifierCard) {
@@ -127,13 +151,7 @@ export class Game {
       p.hasSecondChance = false; 
     });
 
-    // Mélanger le deck si vide
-    if (this.deck.cards.length === 0) {
-      console.log(" La pioche est vide, on mélange les cartes défaussées.");
-      this.deck.cards = [...this.deck.playedCards];
-      this.deck.playedCards = [];
-      this.deck.shuffle();
-    }
+
     // Passer le role dealer à personne à gauche
     const firstPlayer = this.players.shift();
     this.players.push(firstPlayer);
