@@ -16,25 +16,27 @@ export class Game {
 
         this.players.forEach((p) => p.resetForRound());
 
-        // Distribution initiale des cartes
-        for (const player of this.players) {
-            const card = this.deck.draw();
-            if (card instanceof ModifierCard) {
-                console.log(
-                    `🃏 ${player.name} a reçu une carte spéciale: ${card.type} ${card.value}`,
-                );
-                player.addModifier(card); // Ajouter une carte Modifier au joueur
-            } else if (card instanceof ActionCard) {
-                console.log(
-                    `🃏 ${player.name} a reçu une carte spéciale: ${card.type}`,
-                );
-                card.applyEffect(player, this); //Appliquer l'effet de la carte Action
-            } else {
-                console.log(`🃏 ${player.name} a reçu: ${card}`);
-                player.addCard(card);
-            }
+    // Distribution initiale des cartes
+    for (const player of this.players) {
+      const card = this.deck.draw();
+      if (card === null) {
+        console.log("⚠️ Plus de cartes disponibles pour la distribution.");
+        break;
+      }
+      else {
+        if (card instanceof ModifierCard) {
+          console.log(`🃏 ${player.name} a reçu une carte spéciale: ${card.type} ${card.value}`);
+          player.addModifier(card); // Ajouter une carte Modifier au joueur
+        } else if (card instanceof ActionCard) {
+          console.log(`🃏 ${player.name} a reçu une carte spéciale: ${card.type}`);
+          card.applyEffect(player, this); //Appliquer l'effet de la carte Action
+        } else {
+          console.log(`🃏 ${player.name} a reçu: ${card}`);
+          player.addCard(card);
         }
-
+      }
+    }
+      
         // Gestion des tours des joueurs
         for (const player of this.players) {
             if (!player.active) continue; // Ignorer les joueurs inactifs
@@ -176,4 +178,16 @@ export class Game {
 
         return false; // Le jeu continue
     }
+    // Réinitialiser Second Chance à la fin du tour
+    this.players.forEach(p => {
+      p.hasSecondChance = false; 
+    });
+
+
+    // Passer le role dealer à personne à gauche
+    const firstPlayer = this.players.shift();
+    this.players.push(firstPlayer);
+
+    return false; // Le jeu continue
+  }
 }
