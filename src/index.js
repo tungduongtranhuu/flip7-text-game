@@ -6,7 +6,16 @@ async function main() {
     console.log("🎴 FLIP 7 - TEXT GAME");
 
     // Demander le nombre de joueurs et leurs noms
-    const nbPlayers = parseInt(await ask("Nombre de joueur: "));
+    let nbPlayers;
+    do {
+        nbPlayers = parseInt(await ask("Nombre de joueur: "));
+        if (isNaN(nbPlayers) || nbPlayers <= 1) {
+            console.log(
+                "Veuillez entrer un nombre valide de joueurs (au moins 2).",
+            );
+        }
+    } while (isNaN(nbPlayers) || nbPlayers <= 1);
+
     const players = [];
 
     for (let i = 0; i < nbPlayers; i++) {
