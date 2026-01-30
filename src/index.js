@@ -28,11 +28,11 @@ async function main() {
     let gameWon = false;
     while (!gameWon) {
         gameWon = await game.startRound();
-        if (!gameWon){
-          console.log("\n=== Scores actuels ===");
-          players.forEach((p) => console.log(`${p.name}: ${p.score} pts`));
+        if (!gameWon) {
+            console.log("\n=== Scores actuels ===");
+            players.forEach((p) => console.log(`${p.name}: ${p.score} pts`));
         }
-        }
+    }
     closeInput();
 }
 
